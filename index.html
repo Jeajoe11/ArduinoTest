@@ -11,7 +11,7 @@
   <script>
     async function connectToArduino() {
       try {
-        const device = await navigator.usb.requestDevice({ filters: [{ vendorId: 0x2341, productId: 0x805a }] }); // Replace with your Arduino's IDs
+        const device = await navigator.usb.requestDevice({ filters: [{ vendorId: 2341}] }); 
         await device.open();
         await device.selectConfiguration(1);
         const inEndpoint = device.configuration.interfaces[0].alternates[0].endpoints[0]; 
