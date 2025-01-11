@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebUSB LED Control</title>
+</head>
+<body>
+  <h1>WebUSB LED Control</h1>
+  <button onclick="turnOnLED()">Turn On LED</button>
+  <button onclick="turnOffLED()">Turn Off LED</button>
+
+  <script>
+    async function connectToArduino() {
+      try {
+        const device = await navigator.usb.requestDevice({ filters: [{ vendorId: 0x2341, productId: 0x805a }] }); // Replace with your Arduino's IDs
+        await device.open();
+        await device.selectConfiguration(1);
+        const inEndpoint = device.configuration.interfaces[0].alternates[0].endpoints[0]; 
+        const outEndpoint = device.configuration.interfaces[0].alternates[0].endpoints[1]; 
+        return { device, inEndpoint, outEndpoint };
+      } catch (error) {
+        console.error('Error connecting to Arduino:', error);
+        return null;
+      }
+    }
+
+    async function sendCommand(command) {
+      const { device, outEndpoint } = await connectToArduino();
+      if (device) {
+        const transfer = await device.transferOut(outEndpoint.endpointNumber, new Uint8Array([command]));
+        console.log('Command sent:', command);
+      }
+    }
+
+    async function turnOnLED() {
+      sendCommand('1');
+    }
+
+    async function turnOffLED() {
+      sendCommand('0');
+    }
+  </script>
+</body>
+</html>
